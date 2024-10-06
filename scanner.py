@@ -144,8 +144,7 @@ def packet_callback(packet):
     # Convert the raw packet to hex format
     raw_data = bytes(packet)
     hex_data = raw_data.hex()
-    
-    print(packet.summary())
+
     # Process the Ethernet header
     print(f"Captured Packet (Hex): {hex_data}")
     parse_ethernet_header(hex_data)
@@ -156,12 +155,14 @@ def capture_packets(interface, capture_filter, packet_count):
     sniff(iface=interface, filter=capture_filter, prn=packet_callback, count=packet_count)
 
 def capture_input():
+    # order of input: [protocol filter] and [host filter]
+    accepted_protocols = ["tcp", "udp", "arp"]
     captured_filter = sys.argv[1]
     captured_filter = captured_filter.lower().strip()
-    if captured_filter == "tcp" or captured_filter == "arp" or captured_filter == "udp" or captured_filter == "ipv4":
-        capture_packets("", captured_filter, 1)
+    if any(protocol in captured_filter for protocol in accepted_protocols):
+        capture_packets("eth0", captured_filter, 1)
     else:
-        print("Invalid filter inputted.")
+        print("Incorrect input, please specify the type of protocol (tcp, udp, arp) you are trying to filter for.")
 
 capture_input()
 
